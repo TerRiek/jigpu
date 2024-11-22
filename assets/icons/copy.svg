@@ -1,0 +1,24 @@
+<svg
+  width="30"
+  height="30"
+  viewBox="0 0 30 30"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+<path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M10.25 8.5H16.2283C16.5984 8.5 16.9216 8.7011 17.0945 9H18.1653C17.9432 8.13739 17.1602 7.5 16.2283 7.5H10.25C9.14543 7.5 8.25 8.39543 8.25 9.5V17.2391C8.25 18.1711 8.88739 18.9541 9.75 19.1761V18.1053C9.4511 17.9324 9.25 17.6093 9.25 17.2391V9.5C9.25 8.94771 9.69771 8.5 10.25 8.5Z"
+    fill="white"
+  />
+<rect
+    x="11"
+    y="10.25"
+    width="9.5"
+    height="11"
+    rx="1.5"
+    fill="black"
+    stroke="white"
+  />
+<circle cx="15" cy="15" r="14.5" stroke="white" />
+</svg>

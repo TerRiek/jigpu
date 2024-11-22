@@ -1,0 +1,19 @@
+<svg
+  width="14"
+  height="17"
+  viewBox="0 0 14 17"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+<path
+    d="M12.2778 7.55581C13 8.00026 13 9.05581 12.2778 9.4447L6.94445 12.6669L1.66667 15.8336C0.944445 16.278 0 15.7225 0 14.8891V8.50026V2.11137C0 1.22248 0.944445 0.722484 1.66667 1.16693L6.94445 4.33359L12.2778 7.55581Z"
+    fill="white"
+  />
+<path
+    d="M12.8359 1V16"
+    stroke="white"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

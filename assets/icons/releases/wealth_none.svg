@@ -1,0 +1,30 @@
+<svg
+  width="40"
+  height="38"
+  viewBox="0 0 40 38"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+<path
+    d="M24.0202 18.3957H14.4522V12.2357H15.6842V14.2997H22.8042V12.2357H24.0202V18.3957ZM19.8282 25.6917H18.6122V21.0837H12.9322V20.0597H25.5562V21.0837H19.8282V25.6917ZM22.8042 17.3877V15.2917H15.6842V17.3877H22.8042Z"
+    fill="white"
+  />
+<line
+    x1="23"
+    y1="1"
+    x2="35"
+    y2="1"
+    stroke="white"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+<line
+    x1="13"
+    y1="1"
+    x2="25"
+    y2="1"
+    stroke="#22DB40"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+</svg>

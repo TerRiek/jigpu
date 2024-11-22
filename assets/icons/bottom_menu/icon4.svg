@@ -1,0 +1,18 @@
+<svg
+  width="22"
+  height="22"
+  viewBox="0 0 22 22"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+<path
+    d="M1 21.9375V19.125C1 16 3.5 13.5 6.62501 13.5H15.375C18.5 13.5 21 16 21 19.125V21.9375"
+    stroke="white"
+    stroke-miterlimit="10"
+  />
+<path
+    d="M11 11C13.7614 11 15.9999 8.76142 15.9999 6C15.9999 3.23858 13.7614 1 11 1C8.23856 1 6 3.23858 6 6C6 8.76142 8.23856 11 11 11Z"
+    stroke="white"
+    stroke-miterlimit="10"
+  />
+</svg>
