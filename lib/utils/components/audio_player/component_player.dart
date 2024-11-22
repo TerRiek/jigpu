@@ -749,13 +749,15 @@ class ComponentPlayer {
         }
         else if(Platform.isIOS) {
           /// url 형태의 음원 파일을 wav로 디코딩
-          /// TODO: 디코딩이 두 방식으로 나뉘어짐
+          /// TODO: 디코딩이 세 방식으로 나뉘어짐
           /// TODO: 첫번째 음원 전체 디코딩 후 재생
           /// TODO: 두번째 음원 비동기적으로 디코딩
+          /// TODO: 세번째 opus 음원을 청크단위로 요청 후 디코딩
           /// TODO: 테스트시 두개 함수중 하나 주석 치면서 테스트
           /// TODO: 디코딩 함수 수정 삭제 추가 가능
           String? cachePath = await searchSong.decodeOpusToWav1(songModel.id);
           // String? cachePath = await searchSong.decodeOpusToWav2(songModel.id);
+          // String? cachePath = await searchSong.progressiveDownload(songModel.id);
 
           // 추가하려는 음원의 정보 생성
           MediaItem mediaItemToAdd;

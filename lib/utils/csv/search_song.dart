@@ -437,6 +437,73 @@ class SearchSong {
     print("getBox : $code => ${box.get(code)} || $imagePath");
   }
 
+  Future<String?> progressiveDownload(String opusUrl) async {
+    /// 파일 경로 설정
+    final cacheDir = await fifoCacheManager.getCacheDirectoryPath();
+    final opusPath = "${cacheDir}/${opusUrl.replaceAll("/", "_").replaceAll(":", "-")}";
+    final wavPath = "${cacheDir}/${opusUrl.replaceAll("/", "_").replaceAll(":", "-").replaceFirst(".opus", "")}.wav";
+    final opusFile = File(opusPath);
+    final wavFile = File(wavPath);
+
+    /// wav 파일이 이미 있다면 디코딩이 이전에 끝난것이므로 리턴
+    if(wavFile.existsSync()) {
+      return wavFile.path;
+    }
+    /// opus 를 청크 단위로 전체 다운로드
+    await progressivseDownloadOpus(opusFile, wavFile, opusUrl);
+    return wavFile.path;
+  }
+
+  Future<void> progressivseDownloadOpus(File opusFile, File wavFile, String opusUrl) async {
+    /// opus가 이미 존재하면 리턴
+    if (opusFile.existsSync()) {
+      return;
+    }
+
+    /// 변수 설정
+    final response = await http.head(Uri.parse(opusUrl));  /// 파일 크기 확인을 위한 HEAD 요청
+    final contentLength = int.parse(response.headers['content-length'] ?? '0'); /// 파일의 전체 크기
+    int chunkSize = 100000;  /// 청크 크기 100KB (필요에 맞게 조절)
+    int startByte = 0;
+    int endByte = chunkSize - 1;
+    bool tf = true;
+
+    /// 빈 opus 파일을 생성
+    final opusSink = opusFile.openWrite(mode: FileMode.append);
+    final wavSink = wavFile.openWrite(mode: FileMode.append);
+
+    /// opus 파일의 데이터를 청크 단위로 다운로드
+    while (startByte < contentLength) {
+      /// 각 청크의 Range 헤더 설정 (몇 바이트씩 받을지 설정)
+      final request = http.Request("GET", Uri.parse(opusUrl))
+        ..headers.addAll({"Range": "bytes=$startByte-$endByte"});
+
+      final response = await request.send();
+
+      /// 상태 코드가 206 (청크 다운로드 성공)일 경우
+      if (response.statusCode == 206) {
+        final chunkData = await response.stream.toBytes();
+        print("Received chunk length: ${chunkData.length} bytes");
+
+        /// 다운로드한 chunk 데이터를 opus 파일에 추가
+        opusSink.add(chunkData);
+        await FFmpegKit.executeAsync('-i ${opusFile.path} -ar 48000 -ac 2 -y ${wavFile.path}');
+
+      } else {
+        print("Failed to download chunk.");
+        break;
+      }
+
+      /// 청크가 끝나면 다음 범위로 설정
+      startByte += chunkSize;
+      endByte = (endByte + chunkSize < contentLength) ? endByte + chunkSize : contentLength - 1;
+      // tf = false;
+    }
+    /// opus 파일의 다운로드가 끝나면
+    opusSink.close();
+  }
+
+
   Future<String?> decodeOpusToWav1(String opusUrl) async {
     // URL에서 파일 이름 추출
     print("opusurl : ${opusUrl}");
