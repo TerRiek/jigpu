@@ -679,9 +679,6 @@ class ComponentPlayer {
           if (currentPlayingIndex != null &&
               currentPlayingIndex < mediaItemList.value.length &&
               mediaItemList.value[currentPlayingIndex].idx == mediaItemToAdd.idx) {
-            print("mediaItemList.value[currentPlayingIndex].idx ${mediaItemList.value[currentPlayingIndex ?? 0].idx}");
-            print("mediaItemList.value[currentPlayingIndex].idx ${mediaItemToAdd.idx}");
-
             debugPrint("동일한 곡 재생 요청");
             await audioPlayerHandler.player.seek(Duration.zero, index: currentPlayingIndex);
             await play();
