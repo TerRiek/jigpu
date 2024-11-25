@@ -651,119 +651,21 @@ class ComponentPlayer {
     await _handleActionWithLock(_isAddSingleTrackRequested, () async {
       try {
         debugPrint("--------------- 재생 목록에 음원 추가 ----------------");
-        // AppAlert.showSuccess("해당 음원이 재생됩니다. 잠시만 기다려주세요.");
+
         audioPlayerHandler.processingState = ProcessingState.loading;
 
-        // if(Platform.isAndroid) {
-        //   final databaseHelper = DatabaseHelperFavoriteSong();
-        //   final filePathData = await databaseHelper.getFilePathBySongIdx(songModel.idx);
-        //
-        //   print("current filePathData : ${filePathData?["filePath"]}");
-        //   /// 이 부분은 나중에 제거하고 재생 50% 이상 되었을때 다운로드 로직 추가
-        //   //     FileInfo? fileInfo = await fifoCacheManager.cacheManager
-        //   //     .getFileFromCache(songModel.id);
-        //   // FileInfo? fileInfoIOS;
-        //   // /// 캐시에 없으면 다운로드 시작
-        //   // Future<FileInfo?>? downloadFuture;
-        //   // if (fileInfo == null && Platform.isAndroid) {
-        //   //   debugPrint("캐시된 파일이 없습니다. 다운로드를 시작합니다.");
-        //   //   downloadFuture =
-        //   //       fifoCacheManager.cacheManager.downloadFile(songModel.id);
-        //   // } else {
-        //   //   debugPrint("캐시된 파일이 있습니다: ${fileInfo?.file.path}");
-        //   // }
-        //
-        //   // 추가하려는 음원의 정보 생성
-        //   MediaItem mediaItemToAdd;
-        //   if (filePathData != null && Platform.isAndroid) {
-        //     mediaItemToAdd = MediaItem(
-        //       idx: songModel.idx,
-        //       id: filePathData["filePath"],
-        //       // 캐시된 파일 경로 사용
-        //       album: songModel.playlistName ?? 'Unknown Album',
-        //       title: songModel.title,
-        //       artist: songModel.artist,
-        //       duration: songModel.duration,
-        //       artUri: songModel.artUri,
-        //     );
-        //   } else {
-        //     mediaItemToAdd = MediaItem(
-        //       idx: songModel.idx,
-        //       id: songModel.id,
-        //       // 네트워크 URL 사용
-        //       album: songModel.playlistName ?? 'Unknown Album',
-        //       title: songModel.title,
-        //       artist: songModel.artist,
-        //       duration: songModel.duration,
-        //       artUri: songModel.artUri,
-        //     );
-        //   }
-        //
-        //   // 현재 재생 중인 곡의 인덱스
-        //   final int? currentPlayingIndex = audioPlayerHandler.player.currentIndex;
-        //   print("currentPlayingIndex : ${currentPlayingIndex}");
-        //   // 동일한 곡이면 초를 0초로 수정하고 종료
-        //   if (currentPlayingIndex != null &&
-        //       currentPlayingIndex < mediaItemList.value.length &&
-        //       mediaItemList.value[currentPlayingIndex].idx ==
-        //           mediaItemToAdd.idx) {
-        //     debugPrint("동일한 곡 재생 요청");
-        //     await audioPlayerHandler.player.seek(
-        //         Duration.zero, index: currentPlayingIndex);
-        //     await play();
-        //     debugPrint("현재 재생 중인 곡과 동일하므로 새로 추가하지 않고 초를 0초로 수정합니다.");
-        //   }
-        //   else {
-        //     // 기존 재생 목록을 업데이트하여 중복된 항목을 제거하고 새 항목을 추가
-        //     List<MediaItem> updatedMediaList = List.from(mediaItemList.value);
-        //     // updatedMediaList.removeWhere((item) =>
-        //     // item.idx == mediaItemToAdd.idx);
-        //
-        //     updatedMediaList.insert(0, mediaItemToAdd); // 새로 추가할 음악을 첫 번째 인덱스에 추가
-        //     // updatedMediaList.add(mediaItemToAdd);
-        //
-        //     /// 재생목록을 100곡으로 제한 - 100곡이 넘으면 오래된 곡부터 제거
-        //     if(updatedMediaList.length > 100) {
-        //       updatedMediaList.removeLast();
-        //     }
-        //
-        //     // 재생 목록을 업데이트
-        //     mediaItemList.value = updatedMediaList;
-        //     await audioPlayerHandler.updatePlaylist(updatedMediaList);
-        //     debugPrint("재생목록 업데이트 완료: $updatedMediaList");
-        //
-        //     // 새 목록을 플레이어에 설정
-        //     int newTrackIndex = 0;
-        //     debugPrint("새 트랙 인덱스: $newTrackIndex");
-        //
-        //     await audioPlayerHandler.player.setAudioSource(
-        //         audioPlayerHandler.playlist, initialIndex: newTrackIndex);
-        //     debugPrint("AudioSource 설정 완료");
-        //     await audioPlayerHandler.player.seek(
-        //         Duration.zero, index: newTrackIndex);
-        //     debugPrint("Seek 완료");
-        //     debugPrint("추가하려는 음원: ${songModel.title}");
-        //     mediaCurrent.value = mediaItemToAdd.toSongModel();
-        //     await audioPlayerHandler.play();
-        //     debugPrint("mediaCurrent 설정 완료");
-        //   }
-        // }
-        // else
-        if(Platform.isIOS || Platform.isAndroid) {
-          /// url 형태의 음원 파일을 wav로 디코딩
-          // String? cachePath = await searchSong.decodeOpusToWav(songModel.id);
-          // searchSong.progressiveDownload(songModel.id);
+        if (Platform.isIOS || Platform.isAndroid) {
           final cacheDir = await fifoCacheManager.getCacheDirectoryPath();
           final cachePath = "${cacheDir}/${songModel.id.replaceAll("/", "_").replaceAll(":", "-").replaceAll(".opus", "")}.wav";
-          /// TODO: api 주소 로컬로 수정 필요
-          /// TODO: progressive download api 호출 하는 함수
-          StreamProgressive().progressiveDownload("https://api.jigpu.com:2126/stream_opus_audio_full", cachePath);
 
-          // 추가하려는 음원의 정보 생성
+          // Progressive download 시작
+          final streamProgressive = StreamProgressive();
+          streamProgressive.progressiveDownloadByFile(songModel.id, cachePath);
+
+          // 미디어 아이템 생성
           MediaItem mediaItemToAdd = MediaItem(
             idx: songModel.idx,
             id: cachePath,
-            // 캐시된 파일 경로 사용
             album: songModel.playlistName ?? 'Unknown Album',
             title: songModel.title,
             artist: songModel.artist,
@@ -771,63 +673,54 @@ class ComponentPlayer {
             artUri: songModel.artUri,
           );
 
-          // 현재 재생 중인 곡의 인덱스
           final int? currentPlayingIndex = audioPlayerHandler.player.currentIndex;
           print("currentPlayingIndex : ${currentPlayingIndex}");
-          // 동일한 곡이면 초를 0초로 수정하고 종료1
+
           if (currentPlayingIndex != null &&
               currentPlayingIndex < mediaItemList.value.length &&
-              mediaItemList.value[currentPlayingIndex].idx ==
-                  mediaItemToAdd.idx) {
+              mediaItemList.value[currentPlayingIndex].idx == mediaItemToAdd.idx) {
+            print("mediaItemList.value[currentPlayingIndex].idx ${mediaItemList.value[currentPlayingIndex ?? 0].idx}");
+            print("mediaItemList.value[currentPlayingIndex].idx ${mediaItemToAdd.idx}");
+
             debugPrint("동일한 곡 재생 요청");
-            await audioPlayerHandler.player.seek(
-                Duration.zero, index: currentPlayingIndex);
+            await audioPlayerHandler.player.seek(Duration.zero, index: currentPlayingIndex);
             await play();
             debugPrint("현재 재생 중인 곡과 동일하므로 새로 추가하지 않고 초를 0초로 수정합니다.");
           } else {
-            while(!StreamProgressive.canFileOpen) {
+            // 청크 다운로드가 완료될 때까지 대기
+            while (!StreamProgressive.canFileOpen) {
               await Future.delayed(const Duration(milliseconds: 300));
             }
-
-            // 기존 재생 목록을 업데이트하여 중복된 항목을 제거하고 새 항목을 추가
+            print("StreamProgressive.canFileOpen 끝");
+            // 재생 목록 업데이트
             List<MediaItem> updatedMediaList = List.from(mediaItemList.value);
-            // updatedMediaList.removeWhere((item) =>
-            // item.idx == mediaItemToAdd.idx);
+            updatedMediaList.insert(0, mediaItemToAdd);
 
-            updatedMediaList.insert(0, mediaItemToAdd); // 새로 추가할 음악을 첫 번째 인덱스에 추가
-            // updatedMediaList.add(mediaItemToAdd);
-
-            /// 재생목록을 100곡으로 제한 - 100곡이 넘으면 오래된 곡부터 제거
-            if(updatedMediaList.length > 100) {
+            // 100곡 제한 유지
+            if (updatedMediaList.length > 100) {
               updatedMediaList.removeLast();
             }
 
-            // 재생 목록을 업데이트
             mediaItemList.value = updatedMediaList;
             await audioPlayerHandler.updatePlaylist(updatedMediaList);
 
-            debugPrint("재생목록 업데이트 완료: $updatedMediaList");
-
-            // 새 목록을 플레이어에 설정
+            // 새 트랙 재생
             int newTrackIndex = 0;
             debugPrint("새 트랙 인덱스: $newTrackIndex");
 
             await audioPlayerHandler.player.setAudioSource(
                 audioPlayerHandler.playlist, initialIndex: newTrackIndex);
             debugPrint("AudioSource 설정 완료");
-            await audioPlayerHandler.player.seek(
-                Duration.zero, index: newTrackIndex);
+            await audioPlayerHandler.player.seek(Duration.zero, index: newTrackIndex);
             debugPrint("Seek 완료");
             debugPrint("추가하려는 음원: ${songModel.title}");
             mediaCurrent.value = mediaItemToAdd.toSongModel();
 
-            // await streamProgressive.play(downloadedFilePath);
             await audioPlayerHandler.play();
             debugPrint("mediaCurrent 설정 완료");
           }
           return;
         }
-
       } catch (e) {
         debugPrint("ERROR===> $e");
       }

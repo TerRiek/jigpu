@@ -3,6 +3,7 @@ import 'package:jigpu_1/pages/home/home_bottom_menu.dart';
 import 'package:jigpu_1/pages/home/screens/home_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
